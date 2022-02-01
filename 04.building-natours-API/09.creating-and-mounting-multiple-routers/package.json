@@ -1,0 +1,15 @@
+{
+  "name": "natours",
+  "version": "1.0.0",
+  "description": "Building natours api",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "MkMonir",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "morgan": "^1.10.0"
+  }
+}
