@@ -84,8 +84,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   });
 });
 
-//AGGREGATION PIPELINEs
-
+//AGGREGATION PIPELINES
 exports.getTourStats = catchAsync(async (req, res) => {
   const stats = await Tour.aggregate([
     {
