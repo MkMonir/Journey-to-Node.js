@@ -19,6 +19,7 @@
       {
         "noUselessIndex": true
       }
-    ]
+    ],
+    "arrow-body-style": ["off", "always"]
   }
 }
