@@ -11,6 +11,18 @@ const signToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -22,16 +34,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordResetToken: req.body.passwordResetToken,
     passwordResetExpires: req.body.passwordResetExpires,
   });
-
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -50,12 +53,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) note: if everything is ok send token to the client
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -156,12 +154,26 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3) note: UPGRADE changePasswordAt PROPERTY FOR THE USER
+  // ON THE USERMODELS FILE
 
   // 4) note: LOG THE USER IN SEND JWT
-  const token = signToken(user._id);
+  createSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) note: GET USER FROM COLLECTION
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2) note: CHECK IF POSTED CURRENT PASSWORD IS CORRECT
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is incorrect', 401));
+  }
+
+  // 3) note: IF SO UPDATE PASSWORD
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) note: LOG USER IN SEND JWT
+  createSendToken(user, 200, res);
 });
