@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -13,6 +14,15 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Global MIDDLEWARE
+const limiter = rateLimit({
+  max: 100,
+  windowms: 15 * 60 * 1000,
+  message: 'Too many requests from this ip, Please try again in an hour.',
+});
+
+app.use('/api', limiter);
 
 // app.use(express.static('./public'));
 app.use(express.json());
