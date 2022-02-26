@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const monogoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -38,6 +39,20 @@ app.use(monogoSanitize());
 
 // note: DATA SANITIZATION AGAINST XSS(XROSS-SITE SCRIPTING ATTACKS)
 app.use(xss());
+
+// note: PREVENT PARAMETER POLLUTION
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsAverage',
+      'ratingsQuantity',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 // note: SERVING STATIC FILES
 // app.use(express.static('./public'));
