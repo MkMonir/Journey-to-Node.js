@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const monogoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -30,6 +32,12 @@ app.use('/api', limiter);
 
 // note: BODY PARSER, READING DATA FROM BODY INTO REQ.BODY
 app.use(express.json({ limit: '10kb' }));
+
+// note: DATA SANITIZATION AGAINST NoSQL QUERY INJECTION
+app.use(monogoSanitize());
+
+// note: DATA SANITIZATION AGAINST XSS(XROSS-SITE SCRIPTING ATTACKS)
+app.use(xss());
 
 // note: SERVING STATIC FILES
 // app.use(express.static('./public'));
