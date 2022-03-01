@@ -13,6 +13,11 @@ const filterObj = (obj, ...allowedFields) => {
 
 //////////// Users Route handlers
 
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) note: Create error if user posts password data
   if (req.body.password || req.body.passwordConfirm) {
@@ -59,7 +64,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 exports.getAllUsers = factory.getAll(User);
 
 //// Get User
-exports.getUser = factory.getOne(User);
+exports.getUserById = factory.getOne(User);
 
 //// Update User
 exports.updateUser = factory.updateOne(User);
