@@ -1,5 +1,4 @@
 node_modules
 .ds_store
 dist
-public
 config.env
