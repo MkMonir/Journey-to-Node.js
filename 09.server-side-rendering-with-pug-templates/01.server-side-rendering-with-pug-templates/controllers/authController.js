@@ -71,6 +71,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -94,6 +96,31 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // note: GRANT ACCESS TO PROTECTED DATA
   req.user = currentUser;
+  next();
+});
+
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // 1) note: Verify cookie
+  if (req.cookies.jwt) {
+    // 2) note: VERIFICATION TOKEN
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+
+    // 3) note: CHECK IF USER STILL EXIST
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    // 4) note: CHEK ID USER CHANGE PASSWORD AFTER THE TOKEN WAS ISSUED
+    if (currentUser.changePasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // note: There is a  logged in user
+    res.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 
