@@ -1,6 +1,9 @@
 const express = require('express');
+const multer = require('multer');
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
+
+const upload = multer({ dest: 'public/img/users' });
 
 const router = express.Router();
 
@@ -17,7 +20,7 @@ router.use(authController.protect);
 router.route('/updateMyPassword').patch(authController.updateMyPassword);
 
 router.route('/me').get(userController.getMe, userController.getUserById);
-router.route('/updateMe').patch(userController.updateMe);
+router.route('/updateMe').patch(upload.single('photo'), userController.updateMe);
 router.route('/deleteMe').delete(userController.deleteMe);
 
 // note: RESTRICT ALL ROUTES AFTER THIS MIDDLEWARE
