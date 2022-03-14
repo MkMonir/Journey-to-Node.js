@@ -17,7 +17,9 @@ router.use(authController.protect);
 router.route('/updateMyPassword').patch(authController.updateMyPassword);
 
 router.route('/me').get(userController.getMe, userController.getUserById);
-router.route('/updateMe').patch(userController.uploadUserPhoto, userController.updateMe);
+router
+  .route('/updateMe')
+  .patch(userController.uploadUserPhoto, userController.resizeUserPhoto, userController.updateMe);
 router.route('/deleteMe').delete(userController.deleteMe);
 
 // note: RESTRICT ALL ROUTES AFTER THIS MIDDLEWARE
