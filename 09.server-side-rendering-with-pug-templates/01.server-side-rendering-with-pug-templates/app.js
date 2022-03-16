@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'development') {
 // note: LIMIR REQUESTS FORM SAME API
 const limiter = rateLimit({
   max: 100,
-  windowms: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   message: 'Too many requests from this ip, Please try again in an hour.',
 });
 app.use('/api', limiter);
